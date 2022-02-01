@@ -28,12 +28,12 @@ pipeline {
                         case 'Maven':
                             // def ejecucion = load 'maven.groovy'
                             // ejecucion.call()
-                            maven.call()
+                            maven.call();
                         break;
                         case 'Gradle':
                             // def ejecucion = load 'gradle.groovy'
                             // ejecucion.call()
-                            gradle.call()
+                            gradle.call();
                         break;
                     }
                 }
