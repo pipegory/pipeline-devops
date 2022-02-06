@@ -18,6 +18,7 @@ pipeline {
             choices: ['Maven', 'Gradle'],
             description: 'Seleccione herramienta de compilacion'
         )
+        text description: 'Enviar los stages separados por ";"... Vacío si necesita todos los stages', name: 'stages'
     }
     stages {
 			stage("Env Variables") {
