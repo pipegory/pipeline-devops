@@ -18,7 +18,7 @@ pipeline {
             choices: ['Maven', 'Gradle'],
             description: 'Seleccione herramienta de compilacion'
         )
-        text description: 'Enviar los stages separados por ";"... Vacío si necesita todos los stages', name: 'stages'
+        text description: 'Enviar los stages separados por ";"... Vacío si necesita todos los stages', name: 'stages_seleccionadas'
     }
     stages {
 			stage("Env Variables") {
@@ -39,7 +39,7 @@ pipeline {
                         case 'Gradle':
                             // def ejecucion = load 'gradle.groovy'
                             // ejecucion.call()
-                            gradle.call();
+                            gradle.call(params.stages_seleccionadas);
                         break;
                     }
                 }
