@@ -2,9 +2,7 @@ package utilities.array
 ​
 def searchKeyInArray(String keyWordsAsString, String splitIdentifier, Map arrayMapToCompare){
     def _array = []
-    if (!keyWordsAsString) {
-      return []
-    }
+
     keyWordsAsString.split("${splitIdentifier}").each{
         def _key = it?.trim()
         if(!_key.equals("") && ( arrayMapToCompare.containsKey(it) )){
