@@ -9,7 +9,7 @@ def searchKeyInArray(String keyWordsAsString, String splitIdentifier, Map arrayM
         }else{
             //it could be 'error'
             println("***************************************************************")
-            figlet  " ${it} "
+            //figlet  " ${it} "
             println "No se encontró como una función válida, las opociones son:${arrayMapToCompare.keySet() as List}"
             println("***************************************************************")
         }
