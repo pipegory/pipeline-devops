@@ -19,60 +19,21 @@ def call(stages){
         'curl_jar': 'stageCurlJar'
     ]
 
-    def listStagesAll = [
-        'stageCleanBuildTest',
-        'stageSonar',
-        'stageRunSpringCurl',
-        'stageUploadNexus',
-        'stageDownloadNexus',
-        'stageRunJar',
-        'stageCurlJar'
-    ]
-
-    def listCI = [
-        'stageCleanBuildTest',
-        'stageSonar',
-        'stageUploadNexus',
-        'stageRunJar',
-    ]
-
-    def listCD = [
-        'stageDownloadNexus',
-        'stageCurlJar',
-    ]
-
     def arrayUtils = new array.arrayExtentions();
     def stagesArray = []
         stagesArray = arrayUtils.searchKeyInArray(stages, ";", listStagesOrder)
 
     if (stagesArray.isEmpty()) {
-        echo 'Full Pipeline'
-        //allStages()
-        listStagesAll.each{ stageFunction ->//variable as param
-            if (env.GIT_BRANCH.contains('feature') && listCI.contains(stageFunction)) {
-
-                echo 'Exec ' + stageFunction
-                "${stageFunction}"()
-            }
-            else if (env.GIT_BRANCH.contains('release') && listCD.contains(stageFunction)) {
-                echo 'Exec ' + stageFunction
-                "${stageFunction}"()
-            }
-        }
+        echo 'El pipeline se ejecutará completo'
+        allStages()
     } else {
-        echo 'Pipeline exec :' + stages
+        echo 'Stages a ejecutar :' + stages
         stagesArray.each{ stageFunction ->//variable as param
-            if (env.GIT_BRANCH.contains('feature') && listCI.contains(stageFunction)) {
-
-                echo 'Exec ' + stageFunction
-                "${stageFunction}"()
-            }
-            else if (env.GIT_BRANCH.contains('release') && listCD.contains(stageFunction)) {
-                echo 'Exec ' + stageFunction
-                "${stageFunction}"()
-            }
+            echo 'Ejecutando ' + stageFunction
+            "${stageFunction}"()
         }
     }
+​
 //     if (stages.isEmpty()) {
 //         echo 'El pipeline se ejecutará completo'
 //         allStages()
@@ -113,7 +74,7 @@ def stageSonar(){
     env.TAREA="Paso 2: Sonar - Análisis Estático"
     stage("$env.TAREA"){
         sh "echo 'Análisis Estático!'"
-        withSonarQubeEnv('sonarqube') {
+        withSonarQubeEnv('sonarqube3') {
             sh "echo 'Calling sonar by ID!'"
             // Run Maven on a Unix agent to execute Sonar.
             sh './gradlew sonarqube -Dsonar.projectKey=ejemplo-gradle -Dsonar.java.binaries=build'
@@ -132,7 +93,7 @@ def stageRunSpringCurl(){
 def stageUploadNexus(){
     env.TAREA="Paso 4: Subir Nexus"
     stage("$env.TAREA"){
-        nexusPublisher nexusInstanceId: 'nexus',
+        nexusPublisher nexusInstanceId: 'nexus3',
         nexusRepositoryId: 'devops-usach-nexus',
         packages: [
             [$class: 'MavenPackage',
@@ -157,7 +118,7 @@ def stageDownloadNexus(){
     // stage("$env.TAREA"){
     stage("Paso 5: Descargar Nexus"){
 
-        sh ' curl -X GET -u $NEXUS_USER:$NEXUS_PASSWORD "http://nexus:8081/repository/devops-usach-nexus/com/devopsusach2020/DevOpsUsach2020/0.0.1/DevOpsUsach2020-0.0.1.jar" -O'
+        sh ' curl -X GET -u $NEXUS_USER:$NEXUS_PASSWORD "http://nexus3:8081/repository/devops-usach-nexus/com/devopsusach2020/DevOpsUsach2020/0.0.1/DevOpsUsach2020-0.0.1.jar" -O'
     }
 }
 def stageRunJar(){

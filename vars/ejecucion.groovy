@@ -1,62 +1,37 @@
-/*
-	forma de invocación de método call:
-	def ejecucion = load 'script.groovy'
-	ejecucion.call()
-*/
-
 def call(){
-
-pipeline {
-    agent any
-    environment {
-    NEXUS_USER         = credentials('NEXUS-USER')
-    NEXUS_PASSWORD     = credentials('NEXUS-PASS')
-    }
-    parameters {
-        choice(
-            name:'compileTool',
-            choices: ['Maven', 'Gradle'],
-            description: 'Seleccione herramienta de compilacion'
-        )
-        text description: 'Enviar los stages separados por ";"... Vacío si necesita todos los stages', name: 'stages_seleccionadas'
-    }
-    stages {
-			stage("Env Variables") {
-						steps {
-								sh "printenv"
-						}
+  pipeline {
+      agent any
+      environment {
+          NEXUS_USER         = credentials('NEXUS-USER')
+          NEXUS_PASSWORD     = credentials('NEXUS-PASS')
+      }
+      parameters {
+            choice choices: ['maven', 'gradle'], description: 'Seleccione una herramienta para preceder a compilar', name: 'compileTool'
+            text description: 'Enviar los stages separados por ";"... Vacío si necesita todos los stages', name: 'stages'
+      }
+      stages {
+          stage("Pipeline"){
+              steps {
+                  script{
+                      sh "env"
+                      env.TAREA = ""
+                      if(params.compileTool == 'maven'){
+                        maven.call(params.stages);
+                      }else{
+                        gradle.call(params.stages)
+                      }
+                  }
+              }
+              post{
+          success{
+            slackSend color: 'good', message: "[FGO] [${JOB_NAME}] [${BUILD_TAG}] Ejecucion Exitosa", teamDomain: 'dipdevopsusac-tr94431'
+          }
+          failure{
+            slackSend color: 'danger', message: "[FGO] [${env.JOB_NAME}] [${BUILD_TAG}] Ejecucion fallida en stage [${env.TAREA}]", teamDomain: 'dipdevopsusac-tr94431'
+          }
         }
-        stage("Pipeline"){
-            steps {
-                script{
-                  switch(params.compileTool)
-                    {
-                        case 'Maven':
-                            // def ejecucion = load 'maven.groovy'
-                            // ejecucion.call()
-                            maven.call();
-                        break;
-                        case 'Gradle':
-                            // def ejecucion = load 'gradle.groovy'
-                            // ejecucion.call()
-                            gradle.call(params.stages_seleccionadas);
-                        break;
-                    }
-                }
-            }
-            post{
-                success{
-                    slackSend color: 'good', message: "[Felipe Gorigoitia] [${JOB_NAME}] [${BUILD_TAG}]  Ejecucion Exitosa", teamDomain: 'dipdevopsusac-tr94431', tokenCredentialId: 'token-jenkins-slack'
-                }
-                failure{
-                    slackSend color: 'danger', message: "[Felipe Gorigoitia] [${env.JOB_NAME}] [${BUILD_TAG}] Ejecucion fallida en stage [${env.TAREA}]", teamDomain: 'dipdevopsusac-tr94431', tokenCredentialId: 'token-jenkins-slack'
-                }
-            }
-        }
-    }
+          }
+      }
+  }
 }
-
-
-}
-
 return this;
