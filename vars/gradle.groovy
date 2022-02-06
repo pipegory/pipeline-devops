@@ -63,7 +63,7 @@ def allStages(){
 
 def stageCleanBuildTest(){
     env.TAREA = "Paso 1: Build && Test"
-    figlet  " build & test "
+    figlet  "build & test"
     stage("$env.TAREA"){
         sh "echo 'Build && Test!'"
         sh "gradle clean build"
